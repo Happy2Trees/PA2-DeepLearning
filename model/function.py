@@ -1,9 +1,30 @@
 import numpy as np
+from model.submodule import baseLayer
+
+# flatten --> reshape
+class flatten(baseLayer):
+    def __init__(self):
+        super().__init__()
+        self.has_param = False
+    def forward(self, input):
+        batch, input_features, input_height, input_width = input.shape
+        # reshape
+        output = input.reshape(batch, -1)
+        return output
+    def backward(self, input, output_grad):
+        batch, input_features, input_height, input_width = input.shape
+        # output grad shape ==> (batch, input_features * input_height * input_width)
+        grad_input = output_grad.reshape(batch, input_features, input_height, input_width)
+        return grad_input
+
 
 def softmax(x, keep_dim=True):
-    return np.exp(x) / np.sum(np.exp(x), axis=-1, keepdims=keep_dim)
+    # to preven overflow
+    max = np.max(x, axis=-1)
+    max = np.expand_dims(max, axis=-1)
+    return np.exp(x-max) / np.sum(np.exp(x-max), axis=-1, keepdims=keep_dim)
 
-
+# ground truth is hot encode, so we can define softmax with -correct + np.log(---)
 def crossEntropy(predict, one_hot):
     # Compute crossentropy from logits[batch,n_classes] and ids of correct answers
     correct = predict[one_hot.astype(np.bool)]
@@ -11,10 +32,10 @@ def crossEntropy(predict, one_hot):
     return error
 
 
+# we can calculate cross entropy grad with math, then softmax(f(x) - p) is grad
 def grad_crossEntropy(predict, one_hot):
 
     # Compute crossentropy gradient from predict[batch,n_classes] and ids of correct answers
     batch_size = predict.shape[0]
-    # to prevent from underflow of numpy, we change data type to float64
     return (-one_hot + softmax(predict)) / batch_size
 

@@ -6,9 +6,11 @@ import math
 class Dataloader():
     def __init__(self, path, is_train=True, shuffle=True, transform=None, batch_size=8):
         path = Path(path)
+        # load image paths
         imagePath = Path(path/'train-images-idx3-ubyte.gz') if is_train else Path(path/'t10k-images-idx3-ubyte.gz')
         labelPath = Path(path/'train-labels-idx1-ubyte.gz') if is_train else Path(path/'t10k-labels-idx1-ubyte.gz')
 
+        # load images
         self.batch_size = batch_size
         self.images = self.loadImages(imagePath)
         self.labels = self.loadLabels(labelPath)
@@ -16,15 +18,15 @@ class Dataloader():
         self.index = 0
 
         # shuffle images
+        self.idx = np.arange(0, self.images.shape[0])
         if shuffle:
-            self.idx = np.arange(0, self.images.shape[0])
             np.random.shuffle(self.idx)
-            self.images = self.images[self.idx]
-            self.labels = self.labels[self.idx]
+#            self.images = self.images[self.idx]
+#            self.labels = self.labels[self.idx]
 
 
     def __len__(self):
-        n_images, _ = self.images.shape
+        n_images, _, _, _ = self.images.shape
         n_images = math.ceil(n_images / self.batch_size)
         return n_images
 
@@ -34,16 +36,17 @@ class Dataloader():
 
 
     def __getitem__(self, index):
-        image = self.images[index * self.batch_size:(index + 1) * self.batch_size]
-        label = self.labels[index * self.batch_size:(index + 1) * self.batch_size]
+        image = self.images[self.idx[index * self.batch_size:(index + 1) * self.batch_size]]
+        label = self.labels[self.idx[index * self.batch_size:(index + 1) * self.batch_size]]
         if self.transform is not None:
             image, label = self.transform(image, label)
         return image, label
 
     def loadImages(self, path):
+        # with GZIP
         with gzip.open(path) as f:
             images = np.frombuffer(f.read(), 'B', offset=16)
-            images = images.reshape(-1, 784).astype(np.float32)
+            images = images.reshape(-1, 1, 28, 28).astype(np.float32)
             return images
 
 
@@ -56,9 +59,8 @@ class Dataloader():
             one_hot[np.arange(rows), labels] = 1
             one_hot = one_hot.astype(np.float64)
             return one_hot
-    # https://stackoverflow.com/questions/48257255/how-to-import-pre-downloaded-mnist-dataset-from-a-specific-directory-or-folder
 
-
+# for enumerate magic python function returns Iterator
 class datasetIterator():
     def __init__(self, dataloader):
         self.index = 0

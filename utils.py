@@ -5,8 +5,9 @@ from PIL import Image
 from pathlib import Path
 import itertools
 
+# return to corresponding model
 def check_model(model):
-    models = ['mlp', 'mlp_v2', 'CNN']
+    models = ['mlp', 'mlp_leaky', 'CNN']
     if model == 'mlp':
         return mlp()
     elif model == 'mlp_leaky':
@@ -17,24 +18,24 @@ def check_model(model):
         return mlp()
 
 
+# draw loss graph
 def plot_loss(losses, title):
     plt.plot(losses, label='trainning losses')
     plt.xlabel("number of iteration")
+    plt.ylabel('Loss')
     plt.title(title)
     plt.savefig(title + '.png')
     plt.show()
 
 
 # reference: http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
-def plot_confusion_matrix(cm, target_names, path, title='Confusion matrix', cmap=None, normalize=True):
+def plot_confusion_matrix(cm, target_names, path, title='Confusion matrix'):
 
-    accuracy = np.trace(cm) / float(np.sum(cm))
-    misclass = 1 - accuracy
+    accuracy = np.trace(cm) / np.sum(cm).astype(np.float64)
 
-    if cmap is None:
-        cmap = plt.get_cmap('Blues')
+    cmap = plt.get_cmap('Blues')
 
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(8, 7))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -44,24 +45,21 @@ def plot_confusion_matrix(cm, target_names, path, title='Confusion matrix', cmap
         plt.xticks(tick_marks)
         plt.yticks(tick_marks, target_names)
 
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    # classwise accuracy text
+    cm = cm.astype('float64') / cm.sum(axis=1)
 
 
-    thresh = cm.max() / 1.5 if normalize else cm.max() / 2
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        if normalize:
+    thresh = cm.max() * (2/3)
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            # classwise accuracy !
             plt.text(j, i, "{:0.4f}".format(cm[i, j]),
-                     horizontalalignment="center",
-                     color="white" if cm[i, j] > thresh else "black")
-        else:
-            plt.text(j, i, "{:,}".format(cm[i, j]),
                      horizontalalignment="center",
                      color="white" if cm[i, j] > thresh else "black")
 
 
     plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
+    plt.ylabel('Ground Truth')
+    plt.xlabel('Output label\naccuracy={:0.4f} -- each text = Classwise Accuracy--'.format(accuracy))
     plt.savefig(Path(path)/title)
     plt.show()

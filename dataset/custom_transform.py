@@ -16,7 +16,7 @@ class Compose(object):
             images, labels = t(images, labels)
         return images, labels
 
-
+# normalize
 class Normalize(object):
     def __call__(self, images, labels):
         # normalize for mnist dataset
