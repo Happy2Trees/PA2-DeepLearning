@@ -167,7 +167,7 @@ class Conv2d(baseLayer):
             return x_padded[:, :, self.padding:-self.padding, self.padding:-self.padding]
         return x_padded
 
-
+# reference : https://wiseodd.github.io/techblog/2016/07/18/convnet-maxpool-layer/
 class MaxPool2d(baseLayer):
     def __init__(self, kernel_size, stride=None, padding=0):
         super().__init__()
