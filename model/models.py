@@ -21,7 +21,7 @@ class CNN(baseLayer):
             nn.Conv2d(64, 128, 3),
             nn.ReLU(),
             nn.MaxPool2d(2),
-            F.flatten(),
+            nn.flatten(),
             nn.linear(1 * 1 * 128, 10)
         ]
         self.activation = []
@@ -74,6 +74,7 @@ class mlp_leaky(baseLayer):
         self.activation = []
 
     def forward(self, x):
+        x = F.flatten(x)
         self.activation = list()
         self.activation.append(x)
         for layer in self.sequntial:

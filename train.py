@@ -5,7 +5,6 @@ import argparse
 from pathlib import Path
 from dataset import custom_transform
 from dataset.dataloader import Dataloader
-from model.models import mlp, CNN
 from model.function import crossEntropy, grad_crossEntropy
 import utils
 import time
@@ -17,7 +16,7 @@ parser.add_argument('--data_dir', type=str, default='./datasets', metavar='PATH'
 parser.add_argument('--save_dir', type=str, default='./pretrained/', metavar='PATH',
                     help='path of saving checkpoint pth')
 parser.add_argument('--pretrained', type=str, default='', metavar='PATH', help='load pretrained weights')
-parser.add_argument('--epoch', type=int, default=10, help='epoch size for training')
+parser.add_argument('--epoch', type=int, default=30, help='epoch size for training')
 parser.add_argument('-f', '--freq', type=int, default=200, help='print frequency for training or test')
 parser.add_argument('--batch_size', type=int, default=32, help='batch size for training')
 parser.add_argument('--num_class', type=int, default=10, help='number of classes to classify of datasets')

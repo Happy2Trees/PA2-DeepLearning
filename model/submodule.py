@@ -5,12 +5,12 @@ class baseLayer():
         pass
 
     def __call__(self, input):
-        output =  self.forward(input)
+        output = self.forward(input)
         return output
 
     def forward(self, input):
         '''warping part'''
-        return input
+        pass
 
     def backward(self, input, output_grad):
         pass
@@ -294,7 +294,7 @@ class MaxPool2d(baseLayer):
 
 class linear(baseLayer):
 
-    def __init__(self, input, output, learning_rate=0.1):
+    def __init__(self, input, output, learning_rate=0.012):
         super().__init__()
         self.has_param = True
         self.learning_rate = learning_rate
@@ -320,4 +320,21 @@ class linear(baseLayer):
         self.weight = self.weight - self.learning_rate * grad_weights
         self.bias = self.bias - self.learning_rate * grad_bias
 
+        return grad_input
+
+class flatten(baseLayer):
+    def __init__(self):
+        super().__init__()
+        self.has_param = False
+
+    def forward(self, input):
+        batch, input_features, input_height, input_width = input.shape
+        # reshape
+        output = input.reshape(batch, -1)
+        return output
+
+    def backward(self, input, output_grad):
+        batch, input_features, input_height, input_width = input.shape
+        # output grad shape ==> (batch, input_features * input_height * input_width)
+        grad_input = output_grad.reshape(batch, input_features, input_height, input_width)
         return grad_input

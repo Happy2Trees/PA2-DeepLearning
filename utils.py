@@ -49,7 +49,9 @@ def plot_confusion_matrix(cm, target_names, path, title='Confusion matrix'):
     cm = cm.astype('float64') / cm.sum(axis=1)
 
 
+    # threshold values
     thresh = cm.max() * (2/3)
+    # put the accuracy each matrix cells
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
             # classwise accuracy !

@@ -2,20 +2,11 @@ import numpy as np
 from model.submodule import baseLayer
 
 # flatten --> reshape
-class flatten(baseLayer):
-    def __init__(self):
-        super().__init__()
-        self.has_param = False
-    def forward(self, input):
-        batch, input_features, input_height, input_width = input.shape
-        # reshape
-        output = input.reshape(batch, -1)
-        return output
-    def backward(self, input, output_grad):
-        batch, input_features, input_height, input_width = input.shape
-        # output grad shape ==> (batch, input_features * input_height * input_width)
-        grad_input = output_grad.reshape(batch, input_features, input_height, input_width)
-        return grad_input
+def flatten(input):
+    batch, input_features, input_height, input_width = input.shape
+    # reshape
+    output = input.reshape(batch, -1)
+    return output
 
 
 def softmax(x, keep_dim=True):
